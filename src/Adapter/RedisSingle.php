@@ -29,7 +29,10 @@ class RedisSingle
 
         // safe
         if($this->safe){
-
+            $value = $this->safe->publicEncrypt($value);
+            if(!$value){
+                $value = $this->safe->publicEncryptBig($value);
+            }
         }
 
         if($expire!==true){
@@ -53,6 +56,13 @@ class RedisSingle
     public function get($key)
     {
         $value = $this->redis->get($key);
+
+        if ($this->safe){
+            $value = $this->safe->privDecrypt($value);
+            if(!$value){
+                $value = $this->safe->privDecryptBig($key);
+            }
+        }
 
         if(!$value){
             return null;
